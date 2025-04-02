@@ -38,7 +38,7 @@ export default function AmbulanceMap({ userId, ambulanceId }: AmbulanceMapProps)
       setCustomIcon(newIcon);
     });
 
-    const socket = new SockJS("http://localhost:8080/ws/ambulance-updates?userId=" + userId);
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=` + userId);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => {

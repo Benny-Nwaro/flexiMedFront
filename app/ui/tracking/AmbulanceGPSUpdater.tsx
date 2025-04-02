@@ -19,7 +19,7 @@ const AmbulanceGPSUpdater: React.FC<AmbulanceGPSUpdaterProps> = ({ ambulanceId, 
       (position: GeolocationPosition) => {
         const { latitude, longitude } = position.coords;
 
-        fetch("http://localhost:8080/api/update-location", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/update-location`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

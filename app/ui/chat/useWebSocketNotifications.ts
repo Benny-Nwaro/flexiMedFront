@@ -18,7 +18,7 @@ const useWebSocketNotifications = (userId: string | null): NotificationData[] =>
   useEffect(() => {
     if (!userId) return;
 
-    const socket = new SockJS("http://localhost:8080/ws/ambulance-updates?userId=" + userId);
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=` + userId);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => {

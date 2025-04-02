@@ -31,7 +31,7 @@ export default function AmbulanceList() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/ambulances", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -60,7 +60,7 @@ export default function AmbulanceList() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/ambulances/${editingAmbulance.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/${editingAmbulance.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export default function AmbulanceList() {
     if (!confirm("Are you sure you want to delete this ambulance?")) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/ambulances/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

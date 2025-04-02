@@ -6,7 +6,7 @@ export function startLiveLocationTracking(ambulanceId: string, userId: string): 
   
     navigator.geolocation.watchPosition(
       (position: GeolocationPosition) => {
-        fetch("http://localhost:8080/api/update-location", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/update-location`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
