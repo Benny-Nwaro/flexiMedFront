@@ -163,7 +163,7 @@ const DriversList = () => {
         {drivers.map((driver) => (
           <div key={driver.userId} className="p-4 border-b-2 border-t-2 rounded-lg shadow-2xl flex flex-col">
             <Image
-              src={driver?.profileImageUrl ?`http://localhost:8080${driver?.profileImageUrl}`: "/profileImage.jpeg"}
+              src={driver?.profileImageUrl ?`${process.env.NEXT_PUBLIC_API_URL}${driver?.profileImageUrl}`: "/profileImage.jpeg"}
               alt="Profile"
               width={96}
               height={96}

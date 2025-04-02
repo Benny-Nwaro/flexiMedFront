@@ -59,7 +59,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     fetchUserData();
   }, []);
-  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `http://localhost:8080${user?.profileImageUrl}`
+  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`
 
   return (
     <div className="flex flex-col h-screen md:flex-row bg-blue-900 max-md:overflow-y-scroll">

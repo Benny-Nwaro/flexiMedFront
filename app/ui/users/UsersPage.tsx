@@ -79,7 +79,7 @@ export default function UsersPage({ user }: UsersPageProps) {
     }
   };
 
-  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `http://localhost:8080${user?.profileImageUrl}`
+  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`
 
   return (
     <div className="flex flex-col items-center justify-center min-h-fit py-10 px-6">

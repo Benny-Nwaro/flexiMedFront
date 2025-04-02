@@ -118,7 +118,7 @@ export default function UserProfileUpdate() {
   if (loading) return <p>Loading profile...</p>;
   if (errorMessage) return <p className="text-red-500">{errorMessage}</p>;
  
-  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `http://localhost:8080${user?.profileImageUrl}`
+  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 shadow-2xl border-l-2 border-r-2 border-white rounded-lg">
