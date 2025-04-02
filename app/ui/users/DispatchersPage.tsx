@@ -97,7 +97,7 @@ export default function DispatchersPage({ user }: DispatchersPageProps) {
         />
       <h2 className="max-md:text-lg text-4xl text-center text-white font-semibold">Welcome, {user?.name}!</h2>
       <p className="text-lg text-gray-400 max-md:text-xs">You're logged in as {user?.role}</p>
-      <NotificationsList userId={user?.userId || ""} ambulanceId={""}  />
+      <NotificationsList userId={user?.userId || ""}  />
     </div>
   );
 }

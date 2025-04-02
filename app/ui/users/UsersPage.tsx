@@ -43,7 +43,7 @@ export default function UsersPage({ user }: UsersPageProps) {
     }
   }, []);
 
-  const handleEmergencySubmit = async (formData: { emergency: string }) => {
+  const handleEmergencySubmit = async (formData: { [key: string]: string | number }) => {
     if (!user?.userId) return alert("User ID is missing.");
     if (!location) return alert("Location not available. Please enable location services.");
 
@@ -53,7 +53,7 @@ export default function UsersPage({ user }: UsersPageProps) {
       longitude: location.longitude,
       requestStatus: "PENDING",
       requestTime: new Date().toISOString(),
-      description: formData.emergency,
+      description: formData.emergency as string, // Type assertion
     };
 
     try {

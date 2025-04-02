@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { lusitana } from "@/app/ui/fonts";
 import { AtSymbolIcon, KeyIcon, ArrowRightIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -120,9 +119,9 @@ export default function LoginForm({ onSwitchToSignUp, onClose }: { onSwitchToSig
         )}
 
         {/* Submit Button */}
-        <Button type="submit" className="mt-4 w-full flex items-center justify-center py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-all">
+        <button type="submit" className="mt-4 w-full flex items-center justify-center py-2 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-all">
           Log in <ArrowRightIcon className="ml-2 h-5 w-5 text-gray-50" />
-        </Button>
+        </button>
       </form>
 
       {/* Switch to Sign Up */}

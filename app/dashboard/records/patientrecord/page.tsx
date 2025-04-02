@@ -132,7 +132,7 @@ export default function PatientRecordCard() {
     }
   };
 
-  console.log(patient)
+  console.log(patient);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -156,7 +156,7 @@ export default function PatientRecordCard() {
         </div>
       ) : (
         <div>
-          <p><strong>Medical Notes:</strong> {patient[0].medicalNotes || "None"}</p>
+          <p><strong>Medical Notes:</strong> {patient.medicalNotes || "None"}</p>
           <div className="mt-4">
             <button onClick={() => setEditMode(true)} className="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</button>
             <button onClick={deletePatientRecord} className="bg-red-500 text-white px-4 py-2 rounded">Delete</button>

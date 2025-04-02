@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import TutorDashboard from "../ui/dashboard/TutorDashboard";
-import InstructorsList from "../ui/users/InstructorsList";
 
 
 export default function Dashboard() {
