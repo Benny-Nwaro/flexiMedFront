@@ -19,7 +19,6 @@ export default function Dashboard() {
 
   return (
     <div className="lg:p-4 relative min-h-screen">
-      {role === "INSTRUCTOR" ? <TutorDashboard /> : <InstructorsList />}
     </div>
   );
 }

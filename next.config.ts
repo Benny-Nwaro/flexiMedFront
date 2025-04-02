@@ -1,17 +1,23 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
-    domains: ["localhost", "exceptionhandling-production.up.railway.app"], // Add your production domain here
+    domains: ["lh3.googleusercontent.com"], // Add Google profile image domain
     remotePatterns: [
+      // Production images
       {
         protocol: "https",
         hostname: "exceptionhandling-production.up.railway.app",
-        pathname: "/uploads/**", // Allow images from the `/uploads/` directory
+        pathname: "/uploads/**",
+      },
+      // Development images
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080", // Ensure this matches your backend port
+        pathname: "/**",
       },
     ],
   },
-  /* Other config options */
 };
 
-export default nextConfig;
+module.exports = nextConfig;

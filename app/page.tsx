@@ -1,79 +1,101 @@
 "use client";
+import Image from "next/image";
+import AcmeLogo from "@/app/ui/acme-logo";
+import dynamic from "next/dynamic";
+import AmbulanceForm from "./ui/ambulance/AmbulanceForm";
+import Link from "next/link"; 
+import { TrainFrontIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchAIResponse } from "@/app/ui/chat/aiService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-import AcmeLogo from '@/app/ui/acme-logo';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
-import { lusitana } from '@/app/ui/fonts';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
+const AmbulanceMap = dynamic(() => import("@/app/ui/tracking/AmbulanceMap"), { ssr: false });
 
 export default function Page() {
-  const isClient = typeof window !== "undefined"; // Ensure client-side execution
+    const [userId, setUserId] = useState("");
+    const [token, setToken] = useState("");
+    const [aiAdvice, setAiAdvice] = useState("");
+    const [showAI, setShowAI] = useState(false);
 
-  const [buttonText, setButtonText] = useState(
-    isClient && localStorage.getItem("token") ? "Dashboard" : "Log in"
-  );
-  const [buttonLink, setButtonLink] = useState(
-    isClient && localStorage.getItem("token") ? "/dashboard" : "/auth/signin"
-  );
+    useEffect(() => {
+        const storedUserId = localStorage.getItem("userId");
+        const storedToken = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (!isClient) return; // Prevent running on the server
+        if (storedUserId) {
+            setUserId(storedUserId);
+            setToken(storedToken || ""); // Ensure token is always a string
+        }
+    }, []);
 
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    const role = localStorage.getItem("role");
+    const handleAIChat = async () => {
+        try {
+            setShowAI(true);
+            setAiAdvice("Loading first-aid advice...");
+            
+            const advice = await fetchAIResponse("I just had an accident please outline the steps for first aid");
+            setAiAdvice(advice);
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            setAiAdvice("Failed to retrieve advice. Please try again.");
+        }
+    };
 
-    if (token && userId && role) {
-      setButtonText("Dashboard");
-      setButtonLink("/dashboard");
-    }
-  }, [isClient]);
+    return (
+        <main className="relative flex flex-col lg:flex-row items-center justify-center min-h-screen bg-blue-900 px-4 lg:py-10 max-md:space-y-24 lg:space-y-0 lg:space-x-16 max-md:p-10">
+            {/* Logo and GIF */}
+            <div className="flex flex-col items-center max-md:-space-y-8">
+                <Image
+                    src="/firstAid.gif"
+                    alt="Ambulance GIF"
+                    width={300}
+                    height={200}
+                    className="hidden md:block"
+                    unoptimized
+                />
+                <Image
+                    src="/firstAid.gif"
+                    alt="Ambulance GIF"
+                    width={80}
+                    height={80}
+                    className="md:hidden"
+                    unoptimized
+                />
+                <AcmeLogo />
+            </div>
 
-  return (
-    <main className="flex min-h-screen flex-col p-6">
-      <div className="flex h-20 shrink-0 items-end rounded-lg bg-blue-900 p-4 md:h-52">
-        <AcmeLogo />
-      </div>
-      <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
-        <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
-          <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Welcome to </strong>
-            <strong className="text-blue-500">flexisAf - LearnHub.</strong>
-            <span> Your ultimate hub for education.</span>
-          </p>
-          <div>
-            <span className="text-md">Developed by </span>
-            <a href="https://benny-nwaro.github.io/myBio/" className="text-blue-500 font-bold">
-              Aroh Ebenezer
-            </a>
-          </div>
-          <Link
-            href={buttonLink}
-            className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-          >
-            <span>{buttonText}</span> <ArrowRightIcon className="w-5 md:w-6" />
-          </Link>
-        </div>
-        <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
-          <Image
-            src="/hero-desktop.jpeg"
-            width={1000}
-            height={760}
-            priority // Ensures image loads faster
-            className="hidden md:block rounded-lg"
-            alt="Screenshots of the dashboard project showing desktop version"
-          />
-          <Image
-            src="/hero-desktop.jpeg"
-            width={560}
-            height={620}
-            priority
-            className="block md:hidden rounded-lg"
-            alt="Screenshot of the dashboard project showing mobile version"
-          />
-        </div>
-      </div>
-    </main>
-  );
+            {/* Form Section */}
+            <div className="w-full max-w-fit border-t-2 border-b-2 rounded-3xl shadow-2xl shadow-black border-white h-fit lg:p-20 max-md:rounded-lg">
+                {token && (
+                    <Link href="/dashboard" className="flex items-center justify-end text-white text-end cursor-pointer hover:underline space-x-2 max-md:pr-3 max-md:pt-2">
+                        <span>Dashboard</span>
+                        <FontAwesomeIcon icon={faArrowUpFromBracket} className="text-white w-4 h-4 rotate-90" />
+                    </Link>
+                )}
+                <AmbulanceForm />
+            </div>
+
+            {/* AI Chat Button */}
+            <button
+                className="fixed bottom-6 right-6 text-white bg-green-700 p-4 rounded-full shadow-3xl shadow-white hover:bg-blue-900 transition"
+                onClick={handleAIChat}
+            >
+                <TrainFrontIcon size={50} />
+            </button>
+
+            {/* AI Advice Popup */}
+            {showAI && (
+                <div className="fixed bottom-28 right-20 text-white border-l-2 border-r-2 border-white bg-blue-900 p-4 rounded-lg shadow-xl w-fit">
+                    <h3 className="text-lg font-semibold">AI First Aid Advice</h3>
+                    <p>{aiAdvice}</p>
+                    <button
+                        className="mt-2 bg-red-600 text-white px-3 py-1 rounded"
+                        onClick={() => setShowAI(false)}
+                    >
+                        Close
+                    </button>
+                </div>
+            )}
+        </main>
+    );
 }

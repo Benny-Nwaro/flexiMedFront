@@ -13,7 +13,7 @@ export default function Signup() {
           </div>
         </div>
         <Suspense>
-          <SignUpForm />
+          {/* <SignUpForm /> */}
         </Suspense>
       </div>
     </main>

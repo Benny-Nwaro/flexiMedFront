@@ -1,37 +1,46 @@
-"use client"; // Ensure this runs only on the client-side
+"use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // For navigation after signup
-import { lusitana } from "@/app/ui/fonts";
-import { AtSymbolIcon, KeyIcon, UserIcon, PhoneIcon } from "@heroicons/react/24/outline";
-import { ArrowRightIcon } from "@heroicons/react/20/solid";
-import { Button } from "./button";
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Mail, Lock, User, Phone, Briefcase } from "lucide-react";
+import LoginForm from "./login-form";
+import Image from "next/image";
 
-export default function SignUpForm() {
-  const router = useRouter();
+const handleGoogleLogin = () => {
+  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
+};
 
-  // Form state
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    phoneNumber: "",
-    dateOfBirth: "",
-    role: "",
-    gender: "",
-  });
+// Function to extract the token from the URL and store it in localStorage
+const extractAndStoreToken = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
 
+  if (token) {
+    localStorage.setItem('token', token);
+    // Optionally, remove the token from the URL to avoid security risks
+    window.history.replaceState({}, document.title, "/"); // Removes query params
+    console.log("Token stored in localStorage.");
+    // You can also redirect the user to a different page after storing the token.
+    // window.location.href = "/dashboard";
+  } else{
+    console.log("No token present in the URL");
+  }
+
+};
+
+export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean; onClose: () => void; role: "DISPATCHER" | "USER" | null }) {
+  const [showLogin, setShowLogin] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", phoneNumber: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle input changes
+  useEffect(() => {
+    extractAndStoreToken();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -40,18 +49,18 @@ export default function SignUpForm() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, role }),
       });
-      console.log(response)
 
-      if (!response.ok) {
-        throw new Error("Signup failed. Please try again.");
+      if (!response.ok) throw new Error("Signup failed. Please try again.");
+
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
-      router.push("/auth/signin");
+      onClose();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -59,151 +68,114 @@ export default function SignUpForm() {
     }
   };
 
+  // const handleGoogleSignUp = () => {
+  //   window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`; // Redirect to backend Google OAuth2 route
+  // };
+
+
+  
+
+  if (!isOpen) return null;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-1">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-2 pt-2">
-        <h1 className={`${lusitana.className} mb-1 text-xl`}>
-          Please enter your details.
-        </h1>
+    <div className="rounded-lg p-6 shadow-lg w-96 border-b-2 border-b-white border-t-2 border-t-white py-12 max-md:w-full max-md:rounded-none max-md:shadow-none">
+      {showLogin ? (
+        <LoginForm onSwitchToSignUp={() => setShowLogin(false)} onClose={onClose} />
+      ) : (
+        <>
+          <h2 className="text-xl text-white font-semibold mb-4">
+            {role === "DISPATCHER" ? "Sign Up to register an Ambulance" : "Request an Ambulance"}
+          </h2>
 
-        {/* First Name */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">First name</label>
-          <div className="relative">
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Enter your first name"
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-            <UserIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
-        {/* Last Name */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">Last name</label>
-          <div className="relative">
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Enter your last name"
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-            <UserIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <div className="flex items-center px-2 mt-1 text-white bg-blue-900 border-b-1 border-b-white rounded-lg">
+              <User className="text-white mr-2" size={18} />
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your name"
+                className="w-full outline-none bg-inherit border-0 my-2"
+                required
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
 
-        {/* Email */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">Email</label>
-          <div className="relative">
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <AtSymbolIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
+            {/* Email */}
+            <div className="flex items-center px-2 mt-1 text-white bg-blue-900 border-b-1 border-b-white rounded-lg">
+              <Mail className="text-white mr-2" size={18} />
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                className="w-full outline-none bg-inherit border-0 my-2"
+                required
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
 
-        {/* Password */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">Password</label>
-          <div className="relative">
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter password"
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-              minLength={6}
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <KeyIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
+            {/* Phone Number */}
+            <div className="flex items-center px-2 mt-1 text-white bg-blue-900 border-b-1 border-b-white rounded-lg">
+              <Phone className="text-white mr-2" size={18} />
+              <input
+                type="tel"
+                name="phoneNumber"
+                placeholder="Enter your phone number"
+                className="w-full outline-none bg-inherit border-0 my-2"
+                required
+                value={formData.phoneNumber}
+                onChange={handleChange}
+              />
+            </div>
 
-        {/* Phone Number */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">Phone number</label>
-          <div className="relative">
-            <input
-              type="number"
-              name="phoneNumber"
-              placeholder="Enter your phone number"
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-              required
-              value={formData.phoneNumber}
-              onChange={handleChange}
-            />
-            <PhoneIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
+            {/* Password */}
+            <div className="flex items-center px-2 mt-1 text-white bg-blue-900 border-b-1 border-b-white rounded-lg">
+              <Lock className="text-white mr-2" size={18} />
+              <input
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                className="w-full outline-none bg-inherit border-0 my-2"
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
 
-        {/* Date of Birth */}
-        <div>
-          <label className="mb-2 block text-xs font-medium text-gray-900">Date of birth</label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            className="peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500"
-            required
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-          />
-        </div>
+            {/* Role Display */}
+            <div className="flex items-center p-2 w-full outline-none bg-inherit border-0">
+              <Briefcase className="text-white mr-2" size={18} />
+              <p className="text-white">{role === "DISPATCHER" ? "DISPATCHER" : "USER"}</p>
+            </div>
 
-        {/* Role Selection */}
-        <div className="flex flex-row items-center gap-4 mt-2">
-          <span className="text-sm">Role:</span>
-          <label className="flex items-center gap-1 text-sm">
-            <input type="radio" name="role" value={'instructor'.toUpperCase()} onChange={handleChange} />
-            Instructor
-          </label>
-          <label className="flex items-center gap-1 text-sm">
-            <input type="radio" name="role" value={'student'.toUpperCase()} onChange={handleChange} />
-            Student
-          </label>
-        </div>
+            <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">
+              {loading ? "Signing up..." : "Sign Up"}
+            </button>
 
-        {/* Gender Selection */}
-        <div className="flex flex-row items-center gap-4 mt-2">
-          <span className="text-sm">Gender:</span>
-          <label className="flex items-center gap-1 text-sm">
-            <input type="radio" name="gender" value={'male'.toUpperCase()} onChange={handleChange} />
-            Male
-          </label>
-          <label className="flex items-center gap-1 text-sm">
-            <input type="radio" name="gender" value={'female'.toUpperCase()} onChange={handleChange} />
-            Female
-          </label>
-        </div>
+            {/* Google Sign-Up Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full  text-white  rounded-md flex flex-col items-center justify-center  transition "
+            >
+               or use
+              <Image src="/google-logo.png" alt="Google" width={120} height={50} className="mr-2" />
+            </button>
 
-        {/* Submit Button */}
-        <Button type="submit" className="mt-6 w-full" disabled={loading}>
-          {loading ? "Signing up..." : "Sign up"}
-          <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
-        </Button>
-
-        {/* Error Message */}
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
-        <p className="text-sm mt-2">
-          Already have an account? <Link href="/auth/signin" className="text-blue-500 font-semibold">Sign in</Link>
-        </p>
-      </div>
-    </form>
+            <p className="text-sm text-center text-white mt-2">
+              Already have an account?{" "}
+              <button onClick={() => setShowLogin(true)} className="text-blue-600 hover:underline">
+                Sign in
+              </button>
+            </p>
+          </form>
+        </>
+      )}
+    </div>
   );
 }

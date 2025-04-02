@@ -4,74 +4,76 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  HomeIcon,
-  DocumentTextIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-  PlusIcon,
-  AcademicCapIcon,
-  ArrowUpTrayIcon,
-  BookOpenIcon,
-  UserPlusIcon,
-} from "@heroicons/react/24/outline";
+  faAmbulance,
+  faTruckMedical,
+  faHandHoldingMedical,
+  faNotesMedical,
+  faHouseUser,
+  faUserTie,
+  faBookOpen,
+  faPlusMinus,
+} from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 interface NavLinksProps {
   role: string | null;
   userId: string | null;
 }
 
-export default function NavLinks({ role, userId }: NavLinksProps) {
+interface NavLink {
+  name: string;
+  href: string;
+  icon: IconDefinition;
+  sublinks?: NavLink[];
+}
+
+export default function NavLinks({ role }: NavLinksProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const links =
-    role === "INSTRUCTOR"
+  const links: NavLink[] =
+    role === "DISPATCHER"
       ? [
-          { name: "Home", href: "/dashboard", icon: HomeIcon },
+          { name: "Home", href: "/dashboard", icon: faHouseUser },
           {
-            name: "Courses",
-            href: "/dashboard/courses",
-            icon: AcademicCapIcon,
+            name: "Ambulances",
+            href: "/dashboard/ambulances",
+            icon: faAmbulance,
             sublinks: [
-              { name: "Create Course", href: "/dashboard/courses/create", icon: PlusIcon },
-              { name: "View Courses", href: "/dashboard/courses/instructorCourses", icon: AcademicCapIcon },
+              { name: "Create Ambulance", href: "/dashboard/ambulances/create", icon: faPlusMinus },
+              { name: "View Ambulances", href: "/dashboard/ambulances/allambulances", icon: faTruckMedical },
             ],
           },
           {
-            name: "Assignments",
-            href: "/dashboard/assignments",
-            icon: DocumentTextIcon,
-            sublinks: [{ name: "View Assignment", href: "/dashboard/assignments/allassignments", icon: DocumentTextIcon }],
+            name: "Drivers",
+            href: "/dashboard/drivers",
+            icon: faUserTie,
+            sublinks: [
+              { name: "Create Driver", href: "/dashboard/drivers/create", icon: faPlusMinus },
+              { name: "View Drivers", href: "/dashboard/drivers/allDrivers", icon: faUserTie }
+            ],
           },
-          { name: "Lessons", href: "/dashboard/lessons/alllessons", icon: BookOpenIcon },
-          { name: "Submissions", href: "/dashboard/submissions", icon: ArrowUpTrayIcon },
+          { name: "Service History", href: "/dashboard/serviceHistory/allservices", icon: faBookOpen },
         ]
       : [
-          { name: "Home", href: "/dashboard", icon: HomeIcon },
+          { name: "Home", href: "/dashboard", icon: faHouseUser },
           {
-            name: "Courses",
-            href: "/dashboard/courses",
-            icon: AcademicCapIcon,
-            sublinks: [
-              { name: "View Courses", href: "/dashboard/courses/allcourses", icon: AcademicCapIcon },
-              { name: "Enrolled Courses", href: "/dashboard/courses/enrolledCourses", icon: UserPlusIcon },
-            ],
+            name: "Requests",
+            href: "/dashboard/requests",
+            icon: faHandHoldingMedical,
+            sublinks: [{ name: "View Requests", href: "/dashboard/requests/userrequests", icon: faHandHoldingMedical }],
           },
           {
-            name: "Assignments",
-            href: "/dashboard/assignments",
-            icon: DocumentTextIcon,
-            sublinks: [{ name: "View Assignment", href: "/dashboard/assignments/allassignments", icon: DocumentTextIcon }],
+            name: "Health Records",
+            href: "/dashboard/healthrecords",
+            icon: faNotesMedical,
+            sublinks: [{ name: "View Records", href: "/dashboard/records/patientrecord", icon: faNotesMedical }],
           },
-          { name: "Lessons", href: "/dashboard/lessons/alllessons", icon: BookOpenIcon },
-          userId && {
-            name: "Submissions",
-            href: `/dashboard/students/${userId}/submissions/`,
-            icon: ArrowUpTrayIcon,
-          },
-        ].filter(Boolean); // Remove null items if userId is missing
+        ];
 
   const toggleDropdown = (name: string) => {
     setOpenDropdown((prev) => (prev === name ? null : name));
@@ -82,8 +84,6 @@ export default function NavLinks({ role, userId }: NavLinksProps) {
   return (
     <>
       {links.map((link) => {
-        if (!link) return null;
-        const LinkIcon = link.icon;
         const isActive = pathname === link.href;
         const isDropdownOpen = openDropdown === link.name;
 
@@ -99,13 +99,11 @@ export default function NavLinks({ role, userId }: NavLinksProps) {
                 }
               }}
               className={clsx(
-                "flex w-full items-center gap-2 p-3 text-sm font-medium rounded-md bg-gray-50 hover:bg-sky-100 hover:text-blue-600 md:px-3",
-                {
-                  "bg-sky-100 border-b-2 border-b-blue-900 text-blue-600": isActive,
-                }
+                "flex w-full items-center gap-2 p-3 text-sm font-medium rounded-md border-b-2 border-white hover:border-t-2 hover:border-t-white md:px-3",
+                { "border-t-2 border-t-green-600 border-b-blue-900 text-white": isActive }
               )}
             >
-              <LinkIcon className="w-6" />
+              <FontAwesomeIcon icon={link.icon} className="text-white w-6 h-6 hover:text-blue-900" />
               <p className="hidden md:block">{link.name}</p>
               {link.sublinks && (
                 <span className="ml-auto">
@@ -118,7 +116,6 @@ export default function NavLinks({ role, userId }: NavLinksProps) {
             {isDropdownOpen && link.sublinks && (
               <div className="ml-6 mt-1 space-y-1">
                 {link.sublinks.map((sublink) => {
-                  const SublinkIcon = sublink.icon;
                   const isSublinkActive = pathname === sublink.href;
 
                   return (
@@ -126,11 +123,11 @@ export default function NavLinks({ role, userId }: NavLinksProps) {
                       key={sublink.name}
                       href={sublink.href}
                       className={clsx(
-                        "flex items-center gap-2 p-2 pl-4 text-sm font-medium text-gray-700 rounded-md hover:bg-sky-100 hover:text-blue-600 max-md:text-xs max-md:text-nowrap",
+                        "flex items-center gap-2 p-2 pl-4 text-sm font-medium text-white rounded-md hover:bg-sky-100 hover:text-blue-600 max-md:text-xs max-md:text-nowrap",
                         { "text-blue-600 bg-sky-100": isSublinkActive }
                       )}
                     >
-                      <SublinkIcon className="w-4" />
+                      <FontAwesomeIcon icon={sublink.icon} className="text-red-500 w-4 h-4" />
                       {sublink.name}
                     </Link>
                   );
