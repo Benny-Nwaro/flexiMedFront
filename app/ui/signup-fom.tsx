@@ -68,11 +68,6 @@ export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean;
     }
   };
 
-  // const handleGoogleSignUp = () => {
-  //   window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`; // Redirect to backend Google OAuth2 route
-  // };
-
-
   
 
   if (!isOpen) return null;
