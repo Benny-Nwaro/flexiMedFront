@@ -30,7 +30,7 @@ export default function AmbulanceMap({ userId, ambulanceId }: AmbulanceMapProps)
 
       const newIcon = new leaflet.Icon({
         iconUrl: "/marker-icon.png",
-        iconSize: [25, 41],
+        iconSize: [25, 50],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
       });
