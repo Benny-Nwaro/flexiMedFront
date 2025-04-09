@@ -63,7 +63,7 @@ const CreateDriverForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8 p-6 border-b-2 border-t-2 rounded-lg shadow-2xl space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-lg text-white mx-auto mt-8 p-6 border-b-2 border-t-2 rounded-lg shadow-2xl space-y-6">
       <h2 className="text-2xl font-bold text-white text-center">Create Driver</h2>
 
       <div className="relative">
@@ -76,7 +76,7 @@ const CreateDriverForm = () => {
           onChange={(e) => setName(e.target.value)}
           required
           placeholder="Full Name"
-          className="mt-1 pl-10 block w-full rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 pl-10 block w-full text-white rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         />
       </div>
 
@@ -90,7 +90,7 @@ const CreateDriverForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="Email"
-          className="mt-1 pl-10 block w-full rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 pl-10 block w-full text-white rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         />
       </div>
 
@@ -104,7 +104,7 @@ const CreateDriverForm = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
           placeholder="Password"
-          className="mt-1 pl-10 block w-full rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 pl-10 block w-full text-white rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         />
       </div>
 
@@ -118,7 +118,7 @@ const CreateDriverForm = () => {
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
           placeholder="Phone Number"
-          className="mt-1 pl-10 block w-full rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="mt-1 pl-10 block w-full text-white rounded-md border-gray-300 bg-blue-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         />
       </div>
 
