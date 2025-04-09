@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { fetchAIResponse } from "@/app/ui/chat/aiService";
 
 
-const AmbulanceMap = dynamic(() => import("@/app/ui/tracking/AmbulanceMap"), { ssr: false });
+// const AmbulanceMap = dynamic(() => import("@/app/ui/tracking/AmbulanceMap"), { ssr: false });
 
 export default function Page() {
     const [userId, setUserId] = useState("");
