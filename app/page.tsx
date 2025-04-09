@@ -7,8 +7,7 @@ import Link from "next/link";
 import { TrainFrontIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchAIResponse } from "@/app/ui/chat/aiService";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
+
 
 const AmbulanceMap = dynamic(() => import("@/app/ui/tracking/AmbulanceMap"), { ssr: false });
 
@@ -50,7 +49,7 @@ export default function Page() {
                     alt="Ambulance GIF"
                     width={300}
                     height={200}
-                    className="hidden md:block"
+                    className="hidden md:block mb-4"
                     unoptimized
                 />
                 <Image
@@ -58,7 +57,7 @@ export default function Page() {
                     alt="Ambulance GIF"
                     width={80}
                     height={80}
-                    className="md:hidden"
+                    className="md:hidden "
                     unoptimized
                 />
                 <AcmeLogo />
@@ -66,12 +65,6 @@ export default function Page() {
 
             {/* Form Section */}
             <div className="w-full max-w-fit border-t-2 border-b-2 rounded-3xl shadow-2xl shadow-black border-white h-fit lg:p-20 max-md:rounded-lg">
-                {token && (
-                    <Link href="/dashboard" className="flex items-center justify-end text-white text-end cursor-pointer hover:underline space-x-2 max-md:pr-3 max-md:pt-2">
-                        <span>Dashboard</span>
-                        <FontAwesomeIcon icon={faArrowUpFromBracket} className="text-white w-4 h-4 rotate-90" />
-                    </Link>
-                )}
                 <AmbulanceForm />
             </div>
 

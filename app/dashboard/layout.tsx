@@ -71,7 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     {/* Main Content */}
     <div className="flex flex-col flex-grow">
       {/* Top Navbar with Profile Avatar */}
-      <div className="flex justify-end items-center py-4 sticky top-0 max-md:top-40 w-full z-50 px-16 bg-blue-900">
+      <div className="flex justify-end items-center py-4 sticky top-0 max-md:top-40 w-full z-30 px-16 bg-blue-900">
         {/* Profile Image */}
         <div className="relative">
           <Image

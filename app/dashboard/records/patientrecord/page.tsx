@@ -5,9 +5,9 @@ import React, { useEffect, useState } from "react";
 interface PatientRecord {
   id: string;
   requestId: string;
-  name: string;
   contact: string;
   medicalNotes: string;
+  patientId: string; // Assuming your backend DTO has patientId
 }
 
 export default function PatientRecordCard() {
@@ -36,13 +36,15 @@ export default function PatientRecordCard() {
     }
 
     setPatientId(storedPatientId);
-    fetchPatientRecord(storedPatientId, token);
+    fetchPatientRecordByPatientId(storedPatientId, token);
   }, []);
 
-  // Fetch patient record by ID
-  const fetchPatientRecord = async (id: string, token: string) => {
+  // Fetch patient record by patientId using the new controller endpoint
+  const fetchPatientRecordByPatientId = async (patientId: string, token: string) => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/patient/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/by-patient-id/${patientId}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -52,7 +54,8 @@ export default function PatientRecordCard() {
 
       if (!response.ok) {
         if (response.status === 401) throw new Error("Unauthorized access. Please log in again.");
-        throw new Error("Failed to fetch patient record.");
+        if (response.status === 404) throw new Error("Patient record not found.");
+        throw new Error(`Failed to fetch patient record: ${response.status}`);
       }
 
       const data: PatientRecord = await response.json();
@@ -71,7 +74,7 @@ export default function PatientRecordCard() {
 
   // Update patient record
   const updatePatientRecord = async () => {
-    if (!patientId) return;
+    if (!patientId || !patient?.id) return; // Ensure both patientId and the record's ID are available
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -80,7 +83,7 @@ export default function PatientRecordCard() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/${patientId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/${patient.id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -91,7 +94,7 @@ export default function PatientRecordCard() {
 
       if (!response.ok) {
         if (response.status === 401) throw new Error("Unauthorized access. Please log in again.");
-        throw new Error("Failed to update record.");
+        throw new Error(`Failed to update record: ${response.status}`);
       }
 
       const updatedData = await response.json();
@@ -104,7 +107,7 @@ export default function PatientRecordCard() {
 
   // Delete patient record
   const deletePatientRecord = async () => {
-    if (!patientId) return;
+    if (!patient?.id) return;
     if (!confirm("Are you sure you want to delete this record?")) return;
 
     const token = localStorage.getItem("token");
@@ -114,7 +117,7 @@ export default function PatientRecordCard() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/${patientId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/patients/${patient.id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -123,7 +126,7 @@ export default function PatientRecordCard() {
 
       if (!response.ok) {
         if (response.status === 401) throw new Error("Unauthorized access. Please log in again.");
-        throw new Error("Failed to delete record.");
+        throw new Error(`Failed to delete record: ${response.status}`);
       }
 
       setPatient(null);
@@ -132,15 +135,15 @@ export default function PatientRecordCard() {
     }
   };
 
-  console.log(patient);
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
   if (!patient) return <p className="text-gray-500">No record found.</p>;
 
   return (
     <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Your medical history</h2>
+      <h2 className="text-xl font-semibold mb-4">Your Medical History</h2>
+      {/* <p><strong>Request ID:</strong> {patient.requestId}</p> */}
+      <p><strong>Contact:</strong> {patient.contact}</p>
 
       {editMode ? (
         <div>

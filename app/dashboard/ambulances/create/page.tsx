@@ -163,11 +163,12 @@ export default function CreateAmbulance() {
         },
         body: JSON.stringify({
           plateNumber: formData.plateNumber,
-          latitude: parseInt(formData.latitude), // Changed to parseInt
-          longitude: parseInt(formData.longitude), // Changed to parseInt
+          latitude: parseFloat(formData.latitude), // Changed to parseFloat
+          longitude: parseFloat(formData.longitude), // Changed to parseFloat
           availabilityStatus: formData.availabilityStatus,
           driverName: formData.driverName,
           driverContact: formData.phoneNumber,
+          driverId: formData.driverId,  // Include driverId in the request
         }),
       });
 
@@ -183,8 +184,8 @@ export default function CreateAmbulance() {
       alert("An error occurred while submitting the form.");
     }
   };
-  console.log(drivers);
 
+  console.log(drivers);
   console.log(formData);
 
   if (loadingDrivers) return <p>Loading Drivers...</p>;

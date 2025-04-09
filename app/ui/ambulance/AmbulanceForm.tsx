@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { FaAmbulance, FaUser } from "react-icons/fa";
 import SignUpForm from "@/app/ui/signup-fom";
 import EmergencyForm from "@/app/ui/emergency/EmergencyForm";
-import NotificationsList from "../chat/NotificationList";
 import UsersPage from "../users/UsersPage";
 import DispatchersPage from "../users/DispatchersPage";
+import DriversPage from "../users/DriversPage";
 
 type UserType = {
   userId: string;
@@ -89,44 +89,8 @@ export default function AmbulanceForm() {
       console.warn("Geolocation is not supported by this browser.");
     }
   }, []);
+  
 
-  // const handleVisibility = () => {
-  //   isModalOpen ? setIsButtonsHidden(true) : setIsButtonsHidden(false);
-  // };
-
-  // const handleEmergencySubmit = async (formData: { emergency: string }) => {
-  //   if (!user?.userId) return alert("User ID is missing.");
-  //   if (!location) return alert("Location not available. Please enable location services.");
-
-  //   const requestBody = {
-  //     userId: user.userId,
-  //     latitude: location.latitude,
-  //     longitude: location.longitude,
-  //     requestStatus: "PENDING",
-  //     requestTime: new Date().toISOString(),
-  //     description: formData.emergency,
-  //   };
-
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) return alert("You are not authenticated.");
-
-  //     console.log("Submitting emergency request:", requestBody);
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/requests`, {
-  //       method: "POST",
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(requestBody),
-  //     });
-  //     if (!response.ok) throw new Error(`Failed to submit request: ${response.statusText}`);
-  //     console.log("Emergency request submitted successfully!");
-  //   } catch (error) {
-  //     console.error("Error submitting emergency request:", error);
-  //     alert("Failed to submit emergency request.");
-  //   }
-  // };
 
   if (user?.role === "USER") {
     if (!token) {
@@ -140,7 +104,15 @@ export default function AmbulanceForm() {
       return <div className="text-white text-center">Loading...</div>;
     }
     return(
-      <DispatchersPage user={user}/>
+      <DispatchersPage user={user} jwtToken={token}/>
+    )
+  }
+  else if(user?.role === "DRIVER"){
+    if (!token) {
+      return <div className="text-white text-center">Loading...</div>;
+    }
+    return(
+      <DriversPage user={user} jwtToken={token}/>
     )
   }
   else{

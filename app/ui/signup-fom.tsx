@@ -9,22 +9,26 @@ const handleGoogleLogin = () => {
   window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
 };
 
-// Function to extract the token from the URL and store it in localStorage
 const extractAndStoreToken = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
 
   if (token) {
     localStorage.setItem('token', token);
-    // Optionally, remove the token from the URL to avoid security risks
     window.history.replaceState({}, document.title, "/"); // Removes query params
     console.log("Token stored in localStorage.");
-    // You can also redirect the user to a different page after storing the token.
-    // window.location.href = "/dashboard";
-  } else{
+
+    // First reload attempt
+    window.location.reload();
+
+    // Set a timeout for a second reload attempt after a brief delay
+    setTimeout(() => {
+      console.log("Second reload attempt.");
+      window.location.reload();
+    }, 500); // Adjust the delay (in milliseconds) as needed
+  } else {
     console.log("No token present in the URL");
   }
-
 };
 
 export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean; onClose: () => void; role: "DISPATCHER" | "USER" | null }) {
@@ -32,6 +36,7 @@ export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean;
   const [formData, setFormData] = useState({ name: "", email: "", password: "", phoneNumber: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
 
   useEffect(() => {
     extractAndStoreToken();
@@ -153,15 +158,18 @@ export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean;
             </button>
 
             {/* Google Sign-Up Button */}
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="w-full  text-white  rounded-md flex flex-col items-center justify-center  transition "
-            >
-               or use
-              <Image src="/google-logo.png" alt="Google" width={120} height={50} className="mr-2" />
-            </button>
-
+            {
+              role === "USER" && (<div>
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full  text-white  rounded-md flex flex-col items-center justify-center  transition "
+                >
+                   or use
+                  <Image src="/google-logo.png" alt="Google" width={120} height={50} className="mr-2" />
+                </button>
+                </div>)
+            }
             <p className="text-sm text-center text-white mt-2">
               Already have an account?{" "}
               <button onClick={() => setShowLogin(true)} className="text-blue-600 hover:underline">

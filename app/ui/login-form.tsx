@@ -6,7 +6,6 @@ import { AtSymbolIcon, KeyIcon, ArrowRightIcon, ExclamationCircleIcon } from "@h
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-
 const handleGoogleLogin = () => {
   window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`;
 };
@@ -18,15 +17,14 @@ const extractAndStoreToken = () => {
 
   if (token) {
     localStorage.setItem('token', token);
-    // Optionally, remove the token from the URL to avoid security risks
-    window.history.replaceState({}, document.title, "/"); // Removes query params
     console.log("Token stored in localStorage.");
-    // You can also redirect the user to a different page after storing the token.
-    // window.location.href = "/dashboard";
-  } else{
+    // Remove the token from the URL
+    window.history.replaceState({}, document.title, "/");
+    // **Force a page refresh after storing the token**
+    window.location.reload();
+  } else {
     console.log("No token present in the URL");
   }
-
 };
 
 export default function LoginForm({ onSwitchToSignUp, onClose }: { onSwitchToSignUp: () => void; onClose: () => void }) {
@@ -57,7 +55,7 @@ export default function LoginForm({ onSwitchToSignUp, onClose }: { onSwitchToSig
       if (!response.ok) throw new Error(data.message || "Invalid email or password");
 
       localStorage.setItem("token", data.token);
-      router.push("/"); // Redirect on success
+      window.location.reload(); // Reload the page on success
       onClose(); // Close modal after login
     } catch (err: any) {
       setError(err.message);
@@ -71,7 +69,7 @@ export default function LoginForm({ onSwitchToSignUp, onClose }: { onSwitchToSig
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Field */}
         <div>
-        <label className="mb-2 block text-sm font-medium text-white" htmlFor="password">
+          <label className="mb-2 block text-sm font-medium text-white" htmlFor="password">
             email
           </label>
           <div className="relative flex items-center px-2 mt-1  text-white bg-blue-900 border-t-0 border-l-0 border-r-0 border-b-1 border-b-white rounded-lg">
@@ -132,15 +130,15 @@ export default function LoginForm({ onSwitchToSignUp, onClose }: { onSwitchToSig
         </button>
       </div>
 
-         {/* Google Sign-Up Button */}
-         <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="w-full  text-white  rounded-md flex flex-col items-center justify-center  transition "
-            >
-               or use
-              <Image src="/google-logo.png" alt="Google" width={120} height={50} className="mr-2" />
-            </button>
+      {/* Google Sign-Up Button */}
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="w-full  text-white  rounded-md flex flex-col items-center justify-center  transition "
+      >
+        or use
+        <Image src="/google-logo.png" alt="Google" width={120} height={50} className="mr-2" />
+      </button>
 
       {/* Close Button */}
       <button onClick={onClose} className="mt-4 w-full bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 transition">

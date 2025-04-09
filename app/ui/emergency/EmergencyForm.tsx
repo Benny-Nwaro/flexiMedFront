@@ -9,10 +9,38 @@ type EmergencyFormProps = {
 };
 
 const questions = [
-  { id: "emergency", text: "What is the nature of your emergency?", options: ["Accident", "Heart Attack", "Stroke", "Other"] },
-  { id: "medicalHistory", text: "Do you have any medical history?", options: ["Diabetes", "Hypertension", "Asthma", "None"] },
-  { id: "consciousness", text: "Is the patient conscious?", options: ["Yes", "No", "Unresponsive"] },
+  {
+    id: "emergency",
+    text: "What is the nature of your emergency?",
+    options: ["Accident", "Heart Attack", "Stroke", "Other"],
+  },
+  {
+    id: "medicalHistory",
+    text: "Do you have any medical history?",
+    options: ["I have Diabetes", "I have Hypertension", "I have Asthma", "No conditions"],
+  },
+  {
+    id: "allergies",
+    text: "Do you have any known allergies?",
+    options: ["Allergic to some Drugs", "Allergic to some Foods", "Allergic to some Environments", "No allergies"],
+  },
+  {
+    id: "medications",
+    text: "Are you currently on any medication?",
+    options: ["Yes I am on medication", "No I am not on medication"],
+  },
+  {
+    id: "surgeries",
+    text: "Have you had any surgeries in the past?",
+    options: ["Yes I have had surgeries", "No i have not had surgeries"],
+  },
+  {
+    id: "consciousness",
+    text: "Is the patient conscious?",
+    options: ["Yes", "No", "Unresponsive"],
+  },
 ];
+
 
 export default function EmergencyForm({ onSubmit }: EmergencyFormProps) {
   const [currentStep, setCurrentStep] = useState(0);

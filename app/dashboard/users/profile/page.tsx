@@ -1,7 +1,6 @@
 "use client";
 
 import UserProfileUpdate from "@/app/ui/users/UserProfileUpdate";
-import { useState, useEffect } from "react";
 
 
 

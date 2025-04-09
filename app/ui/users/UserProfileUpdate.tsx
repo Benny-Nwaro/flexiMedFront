@@ -9,8 +9,8 @@ import {
   CheckCircleIcon,
   CameraIcon,
 } from "@heroicons/react/24/outline";
-import AcmeLogo from "../acme-logo";
 import Image from "next/image";
+import DashboardLogo from "../dashboard-logo";
 
 interface UserProfile {
   userId: string;
@@ -123,7 +123,7 @@ export default function UserProfileUpdate() {
   return (
     <div className="max-w-md mx-auto mt-10 p-6 shadow-2xl border-l-2 border-r-2 border-white rounded-lg">
       <div className="bg-blue-900 p-4 text-white text-center rounded-t-lg flex flex-col items-center">
-        <AcmeLogo />
+        <DashboardLogo />
         <h4 className="mt-2">Update Profile</h4>
       </div>
 

@@ -124,7 +124,7 @@ export default function NavLinks({ role }: NavLinksProps) {
                       href={sublink.href}
                       className={clsx(
                         "flex items-center gap-2 p-2 pl-4 text-sm font-medium text-white rounded-md hover:bg-sky-100 hover:text-blue-600 max-md:text-xs max-md:text-nowrap",
-                        { "text-blue-600 bg-sky-100": isSublinkActive }
+                        { "text-blue-600 border-t-2 border-green-500": isSublinkActive }
                       )}
                     >
                       <FontAwesomeIcon icon={sublink.icon} className="text-red-500 w-4 h-4" />

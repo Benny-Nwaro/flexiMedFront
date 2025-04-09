@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import EmergencyForm from "@/app/ui/emergency/EmergencyForm";
 import Image from "next/image";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 type UserType = {
   userId: string;
@@ -53,7 +56,8 @@ export default function UsersPage({ user }: UsersPageProps) {
       longitude: location.longitude,
       requestStatus: "PENDING",
       requestTime: new Date().toISOString(),
-      description: formData.emergency as string, // Type assertion
+      description: formData.emergency as string + "," + formData.medicalHistory as string + " "
+      + formData.allergies as string + " "  + formData.medications as string +" " + formData.surgeries as string  // Type assertion
     };
 
     try {
@@ -82,7 +86,12 @@ export default function UsersPage({ user }: UsersPageProps) {
   let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-fit py-10 px-6">
+    <div>
+       <Link href="/dashboard" className="flex items-center justify-end text-white text-end cursor-pointer hover:underline space-x-2 max-md:pr-3 max-md:pt-2">
+             <span>Dashboard</span>
+             <FontAwesomeIcon icon={faArrowUpFromBracket} className="text-white w-4 h-4 rotate-90" />
+         </Link>
+      <div className="flex flex-col items-center justify-center min-h-fit py-10 px-6">
       {/* Profile Image Avatar */}
       <Image
           src={user?.profileImageUrl ?imageUrl : "/profileImage.png"}
@@ -99,5 +108,7 @@ export default function UsersPage({ user }: UsersPageProps) {
       <p className="text-lg text-gray-400 max-md:text-sm">You're logged in as {user?.role}</p>
       <EmergencyForm onSubmit={handleEmergencySubmit} />
     </div>
+    </div>
+
   );
 }
