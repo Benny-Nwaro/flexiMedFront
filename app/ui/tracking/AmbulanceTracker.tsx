@@ -8,7 +8,7 @@ export default function AmbulanceTracker() {
   const [location, setLocation] = useState({ lat: 9.05785, lng: 7.49508 });
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=${userId}`);
+    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-locations?userId=${userId}`);
 
     ws.onmessage = (event) => {
       const { lat, lng } = JSON.parse(event.data);

@@ -78,7 +78,7 @@ export default function AmbulanceMap({ userId, ambulanceId }: AmbulanceMapProps)
   useEffect(() => {
     if (!ambulanceIcon) return; // Wait until icon is ready
 
-    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates`);
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-locations`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log(str),
@@ -86,7 +86,7 @@ export default function AmbulanceMap({ userId, ambulanceId }: AmbulanceMapProps)
 
     stompClient.onConnect = () => {
       console.log("WebSocket connected");
-      stompClient.subscribe(`/user/${userId}/queue/ambulance-location`, (message: Message) => {
+      stompClient.subscribe(`/user/${userId}/queue/ambulance-locations`, (message: Message) => {
         try {
           const locationData = JSON.parse(message.body);
           const lat = parseFloat(locationData.lat);
