@@ -6,7 +6,7 @@ const nextConfig = {
       // Production images
       {
         protocol: "https",
-        hostname: "fleximedbackend-production.up.railway.app",
+        hostname: "https://flexi-med-app-0be2aab2ec6b.herokuapp.com",
         pathname: "/uploads/**",
       },
       // Development images
