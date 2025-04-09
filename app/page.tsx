@@ -64,7 +64,7 @@ export default function Page() {
             </div>
 
             {/* Form Section */}
-            <div className="w-full max-w-fit border-t-2 border-b-2 rounded-3xl shadow-2xl shadow-black border-white h-fit lg:p-20 max-md:rounded-lg">
+            <div className="w-full max-w-2xl border-t-2 border-b-2 rounded-3xl shadow-2xl shadow-black border-white h-fit lg:p-20 max-md:rounded-lg">
                 <AmbulanceForm />
             </div>
 
