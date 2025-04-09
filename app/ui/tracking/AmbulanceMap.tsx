@@ -78,7 +78,7 @@ export default function AmbulanceMap({ userId, ambulanceId }: AmbulanceMapProps)
   useEffect(() => {
     if (!ambulanceIcon) return; // Wait until icon is ready
 
-    const socket = new SockJS("http://localhost:8080/ws/ambulance-updates");
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log(str),

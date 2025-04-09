@@ -49,7 +49,7 @@ const DriversPendingRequests: React.FC<DriversPendingRequestsProps> = ({ jwtToke
         return;
       }
 
-      const ambulanceResponse = await fetch(`http://localhost:8080/api/v1/ambulances/driver/${storedUserId}`, {
+      const ambulanceResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/driver/${storedUserId}`, {
         headers: {
           Authorization: `Bearer ${jwtToken}`,
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const DriversPendingRequests: React.FC<DriversPendingRequestsProps> = ({ jwtToke
       const ambulanceId = ambulanceData.id;
 
       const requestsResponse = await fetch(
-        `http://localhost:8080/api/v1/requests/ambulance/${ambulanceId}?status=DISPATCHED`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/requests/ambulance/${ambulanceId}?status=DISPATCHED`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -97,7 +97,7 @@ const DriversPendingRequests: React.FC<DriversPendingRequestsProps> = ({ jwtToke
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/requests/${requestId}/complete`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/requests/${requestId}/complete`,
         {
           method: 'PUT',
           headers: {

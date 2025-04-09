@@ -39,7 +39,7 @@ const StatusRequests: React.FC<StatusRequestsProps> = ({ jwtToken }) => {
       try {
         // Fetch pending requests
         const pendingResponse = await fetch(
-          `http://localhost:8080/api/v1/requests/status?status=DISPATCHED`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/requests/status?status=DISPATCHED`,
           {
             headers: {
               Authorization: `Bearer ${jwtToken}`,
@@ -57,7 +57,7 @@ const StatusRequests: React.FC<StatusRequestsProps> = ({ jwtToken }) => {
 
         // Fetch dispatched requests
         const dispatchedResponse = await fetch(
-          `http://localhost:8080/api/v1/requests/status?status=DISPATCHED`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/requests/status?status=DISPATCHED`,
           {
             headers: {
               Authorization: `Bearer ${jwtToken}`,
@@ -85,7 +85,7 @@ const StatusRequests: React.FC<StatusRequestsProps> = ({ jwtToken }) => {
   const fetchAmbulanceDetails = async (ambulanceId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/v1/ambulances/${ambulanceId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/${ambulanceId}`,
         {
           headers: {
             Authorization: `Bearer ${jwtToken}`,
@@ -117,7 +117,7 @@ const StatusRequests: React.FC<StatusRequestsProps> = ({ jwtToken }) => {
       formData.append("to", selectedAmbulance.driverContact);
       formData.append("message", "You’ve been dispatched. Please proceed to the emergency location.");
   
-      const response = await fetch("http://localhost:8080/api/v1/sms/send", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/sms/send`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${jwtToken}`,

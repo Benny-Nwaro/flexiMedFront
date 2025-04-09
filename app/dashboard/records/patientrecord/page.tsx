@@ -142,7 +142,6 @@ export default function PatientRecordCard() {
   return (
     <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Your Medical History</h2>
-      {/* <p><strong>Request ID:</strong> {patient.requestId}</p> */}
       <p><strong>Contact:</strong> {patient.contact}</p>
 
       {editMode ? (
