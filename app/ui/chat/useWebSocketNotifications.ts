@@ -20,7 +20,7 @@ const useWebSocketNotifications = (userId: string | null): NotificationData[] =>
 
     console.log(`WebSocket: Connecting for user ${userId}...`);
 
-    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=` + userId);
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=${userId}`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => {
