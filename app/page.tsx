@@ -16,6 +16,7 @@ export default function Page() {
     const [token, setToken] = useState("");
     const [aiAdvice, setAiAdvice] = useState("");
     const [showAI, setShowAI] = useState(false);
+    const [isUserEmergency, setIsUserEmergency] = useState(false);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem("userId");
@@ -32,6 +33,8 @@ export default function Page() {
             setShowAI(true);
             setAiAdvice("Loading first-aid advice...");
             const emergency = localStorage.getItem("emergency")
+            emergency && setIsUserEmergency(true)
+
             
             const advice = await fetchAIResponse("I need first aid advice, I have just had " + emergency);
             setAiAdvice(advice);
@@ -81,7 +84,13 @@ export default function Page() {
             {showAI && (
                 <div className="fixed bottom-28 right-20 text-white border-l-2 border-r-2 border-white bg-blue-900 p-4 rounded-lg shadow-xl w-fit">
                     <h3 className="text-lg font-semibold">AI First Aid Advice</h3>
-                    <p>{aiAdvice}</p>
+                    <div>
+                    {
+                        isUserEmergency ? <p>{aiAdvice}</p>: "At the moment this feature is only availale to users with emergency"
+
+                    }
+                    </div>
+                    
                     <button
                         className="mt-2 bg-red-600 text-white px-3 py-1 rounded"
                         onClick={() => setShowAI(false)}
