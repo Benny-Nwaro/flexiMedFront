@@ -64,6 +64,10 @@ export default function SignUpForm({ isOpen, onClose, role }: { isOpen: boolean;
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
+      if(localStorage.getItem("token") != null){
+          // Reload the page once
+          window.location.reload();
+      }
 
       onClose();
     } catch (err: any) {

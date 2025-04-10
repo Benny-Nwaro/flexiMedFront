@@ -30,7 +30,7 @@ const useWebSocketNotifications = (userId: string | null): NotificationData[] =>
 
     stompClient.onConnect = () => {
       console.log(`WebSocket: Connected for user ${userId}. Subscribing to notifications...`);
-      stompClient.subscribe("/topic/ambulance/" + userId, (message: Message) => {
+      stompClient.subscribe("/user/queue/ambulance-locations", (message: Message) => {
         console.log(`WebSocket: Received message for user ${userId}`);
         try {
           const notificationData: NotificationData = JSON.parse(message.body);
