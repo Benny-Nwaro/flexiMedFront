@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { json } from "stream/consumers";
 
 type UserType = {
   userId: string;
@@ -59,6 +60,7 @@ export default function UsersPage({ user }: UsersPageProps) {
       description: formData.emergency as string + "," + formData.medicalHistory as string + " "
       + formData.allergies as string + " "  + formData.medications as string +" " + formData.surgeries as string  // Type assertion
     };
+    localStorage.setItem("emergency", JSON.stringify(requestBody.description))
 
     try {
       const token = localStorage.getItem("token");

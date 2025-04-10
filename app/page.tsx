@@ -31,8 +31,9 @@ export default function Page() {
         try {
             setShowAI(true);
             setAiAdvice("Loading first-aid advice...");
+            const emergency = localStorage.getItem("emergency")
             
-            const advice = await fetchAIResponse("I just had an accident please outline the steps for first aid");
+            const advice = await fetchAIResponse("I need first aid advice, I have just had " + emergency);
             setAiAdvice(advice);
         } catch (error) {
             console.error("Error fetching AI response:", error);
