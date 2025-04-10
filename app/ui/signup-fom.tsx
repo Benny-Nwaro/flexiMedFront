@@ -18,10 +18,8 @@ const extractAndStoreToken = () => {
     window.history.replaceState({}, document.title, "/"); // Removes query params
     console.log("Token stored in localStorage.");
 
-    // First reload attempt
     window.location.reload();
 
-    // Set a timeout for a second reload attempt after a brief delay
     setTimeout(() => {
       console.log("Second reload attempt.");
       window.location.reload();
