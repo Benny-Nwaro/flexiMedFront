@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { FaAmbulance, FaUser } from "react-icons/fa";
 import SignUpForm from "@/app/ui/signup-fom";
-import EmergencyForm from "@/app/ui/emergency/EmergencyForm";
 import UsersPage from "../users/UsersPage";
 import DispatchersPage from "../users/DispatchersPage";
 import DriversPage from "../users/DriversPage";

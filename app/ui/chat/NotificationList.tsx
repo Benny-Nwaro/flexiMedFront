@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useWebSocketNotifications from "@/app/ui/chat/useWebSocketNotifications";
-// import AmbulanceMap from "../tracking/AmbulanceMap";
+import AmbulanceMap from "../tracking/AmbulanceMap";
 
 interface NotificationData {
   message: string;
@@ -45,8 +45,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification }) => 
             </button>
             <h3 className="text-lg font-semibold text-black mb-2">Ambulance Location</h3>
             {notification.userId && notification.ambulanceId && (
-              // <AmbulanceMap userId={notification.userId} ambulanceId={notification.ambulanceId} />
-              <p>Map</p>
+              <AmbulanceMap userId={notification.userId} ambulanceId={notification.ambulanceId} />
             )}
             {(!notification.userId || !notification.ambulanceId) && <p>Missing User or Ambulance ID</p>}
           </div>
