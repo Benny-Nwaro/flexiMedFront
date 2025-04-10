@@ -14,27 +14,32 @@ interface NotificationData {
 
 const useWebSocketNotifications = (userId: string | null): NotificationData[] => {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const backendWsEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates`; // Backend WebSocket endpoint
 
   useEffect(() => {
     if (!userId) return;
 
     console.log(`WebSocket: Connecting for user ${userId}...`);
 
-    const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws/ambulance-updates?userId=${userId}`);
+    const socket = new SockJS(`${backendWsEndpoint}?userId=${userId}`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => {
-        console.log("WebSocket Debug: ", str);  // Debug logs for WebSocket activity
+        console.log("WebSocket Debug: ", str);
+      },
+      connectHeaders: {
+        'X-User-Id': userId, // Consider sending userId as a header during connect
       },
     });
 
     stompClient.onConnect = () => {
       console.log(`WebSocket: Connected for user ${userId}. Subscribing to notifications...`);
-      stompClient.subscribe("/user/queue/ambulance-locations", (message: Message) => {
+      // Subscribe to the specific user queue provided by the backend
+      stompClient.subscribe(`/user/queue/ambulance-locations-${userId}`, (message: Message) => {
         console.log(`WebSocket: Received message for user ${userId}`);
         try {
           const notificationData: NotificationData = JSON.parse(message.body);
-          console.log(`WebSocket: Parsed notification:`, notificationData); // Log parsed notification data
+          console.log(`WebSocket: Parsed notification:`, notificationData);
           setNotifications((prevNotifications) => [...prevNotifications, notificationData]);
         } catch (error) {
           console.error("WebSocket: Error parsing notification:", error);
@@ -63,7 +68,7 @@ const useWebSocketNotifications = (userId: string | null): NotificationData[] =>
         stompClient.deactivate().catch(console.error);
       }
     };
-  }, [userId]);
+  }, [userId, backendWsEndpoint]); // Include backendWsEndpoint in the dependency array
 
   console.log("WebSocket Notifications:", notifications);
 
