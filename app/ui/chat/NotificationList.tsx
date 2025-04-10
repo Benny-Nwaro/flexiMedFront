@@ -69,7 +69,11 @@ const NotificationsList: React.FC<NotificationsListProps> = ({ userId }) => {
           <NotificationCard key={index} notification={notification} />
         ))
       ) : (
-        <p className="text-green-500">Your request was submitted and being processed</p>
+        <div className="flex flex-row">
+          <p className="text-green-500">Your request was submitted and is being processed</p>
+          <p>An email will be sent to you once ambulance is dispatched to your location</p>
+        </div>
+        
       )}
     </div>
   );
