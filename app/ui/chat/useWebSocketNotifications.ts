@@ -35,7 +35,7 @@ const useWebSocketNotifications = (userId: string | null): NotificationData[] =>
     stompClient.onConnect = () => {
       console.log(`WebSocket: Connected for user ${userId}. Subscribing to notifications...`);
       // Subscribe to the specific user queue provided by the backend
-      stompClient.subscribe(`/user/queue/ambulance-locations-${userId}`, (message: Message) => {
+      stompClient.subscribe(`/user/queue/ambulance-locations`, (message: Message) => {
         console.log(`WebSocket: Received message for user ${userId}`);
         try {
           const notificationData: NotificationData = JSON.parse(message.body);
