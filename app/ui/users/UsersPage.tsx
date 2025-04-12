@@ -78,10 +78,8 @@ export default function UsersPage({ user }: UsersPageProps) {
       if (!response.ok) throw new Error(`Failed to submit request: ${response.statusText}`);
 
       console.log("Emergency request submitted successfully!");
-      alert("Emergency request submitted!");
     } catch (error) {
       console.error("Error submitting emergency request:", error);
-      alert("Failed to submit emergency request.");
     }
   };
 
