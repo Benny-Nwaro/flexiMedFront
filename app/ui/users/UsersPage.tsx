@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
-import { json } from "stream/consumers";
 
 type UserType = {
   userId: string;
@@ -57,10 +56,18 @@ export default function UsersPage({ user }: UsersPageProps) {
       longitude: location.longitude,
       requestStatus: "PENDING",
       requestTime: new Date().toISOString(),
-      description: formData.emergency as string + "," + formData.medicalHistory as string + " "
-      + formData.allergies as string + " "  + formData.medications as string +" " + formData.surgeries as string  // Type assertion
+      description:
+        formData.emergency as string +
+        "," +
+        formData.medicalHistory as string +
+        " " +
+        formData.allergies as string +
+        " " +
+        formData.medications as string +
+        " " +
+        formData.surgeries as string, // Type assertion
     };
-    localStorage.setItem("emergency", JSON.stringify(requestBody.description))
+    localStorage.setItem("emergency", JSON.stringify(requestBody.description));
 
     try {
       const token = localStorage.getItem("token");
@@ -75,26 +82,48 @@ export default function UsersPage({ user }: UsersPageProps) {
         },
         body: JSON.stringify(requestBody),
       });
-      if (!response.ok) throw new Error(`Failed to submit request: ${response.statusText}`);
 
-      console.log("Emergency request submitted successfully!");
+      if (!response.ok) {
+        // Log the error response body for more details
+        const errorText = await response.text();
+        console.error("Failed to submit request:", {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText,
+        });
+        throw new Error(`Failed to submit request: ${response.statusText}`);
+      }
+
+
+      const responseData = await response.json();  // Parse the JSON response
+      localStorage.setItem("ambulanceId", responseData.ambulanceId)
+      console.log("Emergency request submitted successfully! Response:", responseData); // Log the parsed data
+
     } catch (error) {
       console.error("Error submitting emergency request:", error);
     }
   };
 
-  let imageUrl = user?.profileImageUrl?.startsWith("http")?user.profileImageUrl : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`
+  let imageUrl = user?.profileImageUrl?.startsWith("http")
+    ? user.profileImageUrl
+    : `${process.env.NEXT_PUBLIC_API_URL}${user?.profileImageUrl}`;
 
   return (
     <div>
-       <Link href="/dashboard" className="flex items-center justify-end text-white text-end cursor-pointer hover:underline space-x-2 max-md:pr-3 max-md:pt-2">
-             <span>Dashboard</span>
-             <FontAwesomeIcon icon={faArrowUpFromBracket} className="text-white w-4 h-4 rotate-90" />
-         </Link>
+      <Link
+        href="/dashboard"
+        className="flex items-center justify-end text-white text-end cursor-pointer hover:underline space-x-2 max-md:pr-3 max-md:pt-2"
+      >
+        <span>Dashboard</span>
+        <FontAwesomeIcon
+          icon={faArrowUpFromBracket}
+          className="text-white w-4 h-4 rotate-90"
+        />
+      </Link>
       <div className="flex flex-col items-center justify-center min-h-fit py-10 px-6">
-      {/* Profile Image Avatar */}
-      <Image
-          src={user?.profileImageUrl ?imageUrl : "/profileImage.png"}
+        {/* Profile Image Avatar */}
+        <Image
+          src={user?.profileImageUrl ? imageUrl : "/profileImage.png"}
           alt="Profile"
           width={96}
           height={96}
@@ -104,11 +133,15 @@ export default function UsersPage({ user }: UsersPageProps) {
           }}
         />
 
-      <h2 className="max-md:text-xl text-4xl text-white text-center font-semibold">Welcome, {user?.name}!</h2>
-      <p className="text-lg text-gray-400 max-md:text-sm">You're logged in as {user?.role}</p>
-      <EmergencyForm onSubmit={handleEmergencySubmit} />
+        <h2 className="max-md:text-xl text-4xl text-white text-center font-semibold">
+          Welcome, {user?.name}!
+        </h2>
+        <p className="text-lg text-gray-400 max-md:text-sm">
+          You're logged in as {user?.role}
+        </p>
+        <EmergencyForm onSubmit={handleEmergencySubmit} />
+      </div>
     </div>
-    </div>
-
   );
 }
+

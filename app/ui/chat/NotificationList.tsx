@@ -1,6 +1,9 @@
-import { useState } from "react";
+"use client";
+
+import React, { useState } from "react";
 import useWebSocketNotifications from "@/app/ui/chat/useWebSocketNotifications";
 import AmbulanceMap from "../tracking/AmbulanceMap";
+import AmbulanceDispatchedPage from "@/app/ui/ambulance/AmbulanceDispatchedPage"; // Import the new component
 
 interface NotificationData {
   message: string;
@@ -64,16 +67,13 @@ const NotificationsList: React.FC<NotificationsListProps> = ({ userId }) => {
 
   return (
     <div className="max-w-lg mx-auto mt-4 space-y-4 text-white">
+
       {notifications.length > 0 ? (
         notifications.map((notification, index) => (
           <NotificationCard key={index} notification={notification} />
         ))
       ) : (
-        <div className="flex flex-col">
-          <p className="text-green-500">Your request was submitted and is being processed</p>
-          <p>An email will be sent to you once ambulance is dispatched to your location</p>
-        </div>
-        
+        <AmbulanceDispatchedPage />
       )}
     </div>
   );
