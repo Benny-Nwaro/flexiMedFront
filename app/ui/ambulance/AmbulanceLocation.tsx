@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-import { LatLngExpression } from "leaflet";
+import { LatLngExpression, Icon, Marker as LeafletMarker, Map as LeafletMap } from 'leaflet'; // Import Leaflet types
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then(mod => mod.MapContainer), { ssr: false });
@@ -19,140 +19,127 @@ interface AmbulanceMapProps {
 }
 
 const AmbulanceLocation: React.FC<AmbulanceMapProps> = ({ userId, ambulanceId }) => {
-  const [L, setL] = useState<any>(null);
-  const [ambulanceIcon, setAmbulanceIcon] = useState<any>(null);
-  const [userIcon, setUserIcon] = useState<any>(null);
+  const [L, setL] = useState<typeof import('leaflet') | null>(null); // Use the correct type for Leaflet
+  const [icons, setIcons] = useState<{ ambulance: Icon, user: Icon } | null>(null);
   const [ambulanceLocation, setAmbulanceLocation] = useState<LatLngExpression | null>(null);
-  const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null);
-  const [loading, setLoading] = useState(true);  // Added loading state
-  const [error, setError] = useState<string | null>(null); // Added error state
+  const [userLocation, setUserLocation] = useState<LatLngExpression>(fallbackPosition);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  const mapRef = useRef<LeafletMap | null>(null); // Ref to store the map instance
+  const ambulanceMarkerRef = useRef<LeafletMarker | null>(null);
 
-  // Load Leaflet and icons
+  // Load Leaflet and Icons
   useEffect(() => {
+    let isMounted = true;
+
     import("leaflet").then((leaflet) => {
+      if (!isMounted) return;
+
       setL(leaflet);
 
-      const ambIcon = new leaflet.Icon({
-        iconUrl: "/marker-icon.png", // Replace with ambulance icon
+      const ambulanceIcon = new leaflet.Icon({
+        iconUrl: "/marker-icon.png",
         iconSize: [25, 50],
         iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
       });
 
-      const usrIcon = new leaflet.Icon({
-        iconUrl: "/user-marker-icon.png", // Replace with user icon
+      const userIcon = new leaflet.Icon({
+        iconUrl: "/user-marker-icon.png",
         iconSize: [30, 50],
         iconAnchor: [15, 45],
-        popupAnchor: [1, -34],
       });
 
-      setAmbulanceIcon(ambIcon);
-      setUserIcon(usrIcon);
+      setIcons({ ambulance: ambulanceIcon, user: userIcon });
     });
 
-    // Get user GPS location or fallback
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([latitude, longitude]);
-          console.log("User location from GPS:", latitude, longitude);
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-          setUserLocation(fallbackPosition);
-          console.log("Fallback user location used:", fallbackPosition);
-        },
-        {
-          timeout: 5000,
-          maximumAge: 60000,
-        }
+        ({ coords }) => isMounted && setUserLocation([coords.latitude, coords.longitude]),
+        () => isMounted && setUserLocation(fallbackPosition),
+        { timeout: 5000 }
       );
     } else {
       setUserLocation(fallbackPosition);
-      console.log("Geolocation not supported, fallback used:", fallbackPosition);
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Fetch ambulance location every 5s
+  const fetchAmbulanceLocation = useCallback(async () => {
+    if (!ambulanceId || !L) return;
 
-  // Fetch ambulance location and update it every 5 seconds
-  useEffect(() => {
-    const fetchAmbulanceLocation = async () => {
-      if (!ambulanceId) {
-        setError('Ambulance ID not available.');
-        setLoading(false);
-        return;
-      }
-      if (!L) return;
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token not found.');
 
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Token not found in local storage.');
-          setLoading(false);
-          return;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/${ambulanceId}/location`;
+      const res = await fetch(apiUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error(`Failed to fetch ambulance location: ${res.status}`);
+      const data = await res.json();
+      const newPosition: LatLngExpression = [data.latitude, data.longitude];
+
+      setAmbulanceLocation((prev) => {
+        // Explicitly assert the types of prev and newPosition as [number, number]
+        const prevPosition = prev as [number, number];
+        const newPositionArray = newPosition as [number, number];
+
+        if (!prev || prevPosition[0] !== newPositionArray[0] || prevPosition[1] !== newPositionArray[1]) {
+          // Smooth map pan if location changed
+          mapRef.current?.flyTo(newPositionArray);
+          ambulanceMarkerRef.current?.setLatLng(newPositionArray);
+          return newPositionArray;
         }
-
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ambulances/${ambulanceId}/location`;
-        const response = await fetch(apiUrl, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to fetch ambulance location: ${response.status} - ${response.statusText}. Details: ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log("Ambulance Location Data:", data);
-        setAmbulanceLocation([data.latitude, data.longitude]);
-
-      } catch (error: any) {
-        setError(error.message);
-        console.error("Error fetching ambulance location:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
-    fetchAmbulanceLocation(); // Fetch immediately on component mount
-
-    const intervalId = setInterval(fetchAmbulanceLocation, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(intervalId); // Clear interval on unmount
+        return prev;
+      });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [ambulanceId, L]);
 
-  if (loading) {
-    return <div>Loading ambulance and map...</div>; // Combined loading message
-  }
+  useEffect(() => {
+    fetchAmbulanceLocation();
+    const interval = setInterval(fetchAmbulanceLocation, 5000);
+    return () => clearInterval(interval);
+  }, [fetchAmbulanceLocation]);
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!L || !ambulanceIcon || !userIcon) return <p>Loading map...</p>; // Ensure Leaflet is loaded
+  if (!L || !icons) return <p>Loading map...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
 
   const center = ambulanceLocation || userLocation || fallbackPosition;
 
   return (
     <div className="w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden">
-      <MapContainer center={center} zoom={13} className="h-full w-full">
+      <MapContainer
+        center={center}
+        zoom={13}
+        zoomControl={false} // Hide default zoom control
+        className="h-full w-full"
+        whenReady={() => {}} // Callback with no arguments
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {ambulanceLocation && (
-          <Marker position={ambulanceLocation} icon={ambulanceIcon}>
+          <Marker
+            position={ambulanceLocation}
+            icon={icons.ambulance}
+            ref={(ref) => { ambulanceMarkerRef.current = ref }}
+          >
             <Popup>Ambulance Location</Popup>
           </Marker>
         )}
 
         {userLocation && (
-          <Marker position={userLocation} icon={userIcon}>
+          <Marker position={userLocation} icon={icons.user}>
             <Popup>User Location</Popup>
           </Marker>
         )}

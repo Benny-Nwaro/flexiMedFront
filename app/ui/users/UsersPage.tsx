@@ -82,6 +82,10 @@ export default function UsersPage({ user }: UsersPageProps) {
         },
         body: JSON.stringify(requestBody),
       });
+      const responseData = await response.json();  // Parse the JSON response
+      localStorage.setItem("ambulanceId", responseData.ambulanceId)
+      console.log("Emergency request submitted successfully! Response:", responseData); // Log the parsed data
+
 
       if (!response.ok) {
         // Log the error response body for more details
@@ -95,10 +99,7 @@ export default function UsersPage({ user }: UsersPageProps) {
       }
 
 
-      const responseData = await response.json();  // Parse the JSON response
-      localStorage.setItem("ambulanceId", responseData.ambulanceId)
-      console.log("Emergency request submitted successfully! Response:", responseData); // Log the parsed data
-
+      
     } catch (error) {
       console.error("Error submitting emergency request:", error);
     }

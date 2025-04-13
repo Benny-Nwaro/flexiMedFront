@@ -67,14 +67,17 @@ const NotificationsList: React.FC<NotificationsListProps> = ({ userId }) => {
 
   return (
     <div className="max-w-lg mx-auto mt-4 space-y-4 text-white">
+              <AmbulanceDispatchedPage />
 
-      {notifications.length > 0 ? (
+
+
+      {/* {notifications.length > 0 ? (
         notifications.map((notification, index) => (
           <NotificationCard key={index} notification={notification} />
         ))
       ) : (
         <AmbulanceDispatchedPage />
-      )}
+      )} */}
     </div>
   );
 };
