@@ -122,7 +122,7 @@ const AmbulanceDispatchedPage = () => {
 
       {showModal && userId && ambulanceId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md text-gray-800">
+          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-7xl text-gray-800">
             <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
               <svg className="h-6 w-6 fill-current" viewBox="0 0 20 20">
                 <path
