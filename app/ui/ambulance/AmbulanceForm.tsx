@@ -11,7 +11,7 @@ type UserType = {
   userId: string;
   name: string;
   role: string;
-  profileImageUrl?: string; // Added profile image field
+  profileImageUrl?: string;
 };
 
 type LocationType = {
@@ -27,8 +27,7 @@ export default function AmbulanceForm() {
   const [isButtonHidden, setIsButtonsHidden] = useState(false);
   const [token, setToken] = useState<string | null>(null);
 
-
-  // Fetch token from localStorage and re-render on change
+  // Sync token from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
@@ -44,6 +43,7 @@ export default function AmbulanceForm() {
     return () => window.removeEventListener("storage", checkTokenChange);
   }, []);
 
+  // Fetch user details
   useEffect(() => {
     const fetchUserDetails = async () => {
       const token = localStorage.getItem("token");
@@ -51,6 +51,7 @@ export default function AmbulanceForm() {
         console.warn("No token found in localStorage.");
         return;
       }
+
       try {
         console.log("Fetching user details...");
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/me`, {
@@ -60,11 +61,12 @@ export default function AmbulanceForm() {
             "Content-Type": "application/json",
           },
         });
+
         if (!response.ok) throw new Error(`Failed to fetch user details: ${response.statusText}`);
         const responseData = await response.json();
         console.log("User Details:", responseData);
         localStorage.setItem("userId", responseData?.userId || "");
-        localStorage.setItem("role", user?.role || "");
+        localStorage.setItem("role", responseData?.role || "");
         setUser(responseData);
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -72,50 +74,46 @@ export default function AmbulanceForm() {
     };
 
     fetchUserDetails();
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => console.error("Error fetching location:", error),
-        { enableHighAccuracy: true }
-      );
-    } else {
-      console.warn("Geolocation is not supported by this browser.");
-    }
   }, []);
-  
 
-
-  if (user?.role === "USER") {
-    if (!token) {
-      return <div className="text-white text-center">Loading...</div>;
+  // Fetch location separately
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.warn("Geolocation is not supported by this browser.");
+      return;
     }
-    return (
-      <UsersPage user={user} />
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Geolocation error:", {
+          code: error.code,
+          message: error.message,
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-  }else if(user?.role === "DISPATCHER"){
-    if (!token) {
-      return <div className="text-white text-center">Loading...</div>;
-    }
-    return(
-      <DispatchersPage user={user} jwtToken={token}/>
-    )
+  }, []);
+
+  // Conditional rendering based on user role
+  if (user?.role === "USER") {
+    if (!token) return <div className="text-white text-center">Loading...</div>;
+    return <UsersPage user={user} />;
+  } else if (user?.role === "DISPATCHER") {
+    if (!token) return <div className="text-white text-center">Loading...</div>;
+    return <DispatchersPage user={user} jwtToken={token} />;
+  } else if (user?.role === "DRIVER") {
+    if (!token) return <div className="text-white text-center">Loading...</div>;
+    return <DriversPage user={user} jwtToken={token} />;
   }
-  else if(user?.role === "DRIVER"){
-    if (!token) {
-      return <div className="text-white text-center">Loading...</div>;
-    }
-    return(
-      <DriversPage user={user} jwtToken={token}/>
-    )
-  }
-  else{
-    return (
+
+  // Default screen for role selection
+  return (
     <div className="flex flex-col items-center justify-center min-h-fit lg:px-6">
       <div hidden={isButtonHidden} className="space-y-12 w-full max-w-md max-md:my-12 max-md:px-4">
         <button
@@ -123,7 +121,7 @@ export default function AmbulanceForm() {
             openModal("DISPATCHER");
             setIsButtonsHidden(true);
           }}
-          className="flex items-center justify-center w-full lg:h-40 border-b-2 border-white shadow-2xl  p-6 text-white bg-blue-600 rounded-xl  hover:bg-blue-700 transition-all text-2xl font-semibold"
+          className="flex items-center justify-center w-full lg:h-40 border-b-2 border-white shadow-2xl p-6 text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all text-2xl font-semibold"
         >
           <FaAmbulance className="mr-3 text-4xl" /> Register an Ambulance
         </button>
@@ -137,10 +135,12 @@ export default function AmbulanceForm() {
           <FaUser className="mr-3 text-4xl" /> Request an Ambulance
         </button>
       </div>
+
       <SignUpForm isOpen={isModalOpen} onClose={closeModal} role={selectedRole} />
     </div>
   );
 
+  // Helper functions
   function openModal(role: "DISPATCHER" | "USER") {
     setSelectedRole(role);
     setIsModalOpen(true);
@@ -151,5 +151,4 @@ export default function AmbulanceForm() {
     setSelectedRole(null);
     setIsButtonsHidden(false);
   }
-}
 }

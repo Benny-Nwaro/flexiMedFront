@@ -41,6 +41,7 @@ const questions = [
   },
 ];
 
+const DEFAULT_LOCATION = { latitude: 9.05785, longitude: 7.49508 }; // Example: Abuja
 
 export default function EmergencyForm({ onSubmit }: EmergencyFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,6 +66,7 @@ export default function EmergencyForm({ onSubmit }: EmergencyFormProps) {
 
   const getUserLocation = () => {
     setLocationError(null);
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -74,14 +76,36 @@ export default function EmergencyForm({ onSubmit }: EmergencyFormProps) {
           setLocation({ latitude, longitude, address });
           setShowLocationPrompt(true);
         },
-        (error) => {
+        async (error) => {
           console.error("Error retrieving location:", error);
-          setLocationError("Could not retrieve location. Please enable GPS and try again.");
+          // Suppress alert and directly set default location
+          const address = await fetchAddress(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude);
+          setLocation({
+            ...DEFAULT_LOCATION,
+            address,
+          });
+          setShowLocationPrompt(true);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
-      setLocationError("Geolocation is not supported by your browser.");
+      // Suppress alert and directly set default location
+      fetchAddress(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude)
+        .then((address) => {
+          setLocation({
+            ...DEFAULT_LOCATION,
+            address,
+          });
+          setShowLocationPrompt(true);
+        })
+        .catch((error) => {
+          console.error("Error fetching default address:", error);
+          setLocation({
+            ...DEFAULT_LOCATION,
+            address: "Address not found", // Or some other default message
+          });
+          setShowLocationPrompt(true);
+        });
     }
   };
 
@@ -97,7 +121,7 @@ export default function EmergencyForm({ onSubmit }: EmergencyFormProps) {
     } catch (error) {
       console.error("Error fetching address:", error);
       setAddressLoading(false);
-      return "Error fetching address";
+      return "Address not found"; // Return a default value instead of an error message
     }
   };
 
