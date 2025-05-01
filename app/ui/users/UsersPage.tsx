@@ -48,12 +48,11 @@ export default function UsersPage({ user }: UsersPageProps) {
 
   const handleEmergencySubmit = async (formData: { [key: string]: string | number }) => {
     if (!user?.userId) return alert("User ID is missing.");
-    if (!location) return alert("Location not available. Please enable location services.");
 
     const requestBody = {
       userId: user.userId,
-      latitude: location.latitude,
-      longitude: location.longitude,
+      latitude: location?.latitude || null,
+      longitude: location?.longitude || null,
       requestStatus: "PENDING",
       requestTime: new Date().toISOString(),
       description:
@@ -82,13 +81,11 @@ export default function UsersPage({ user }: UsersPageProps) {
         },
         body: JSON.stringify(requestBody),
       });
-      const responseData = await response.json();  // Parse the JSON response
-      localStorage.setItem("ambulanceId", responseData.ambulanceId)
-      console.log("Emergency request submitted successfully! Response:", responseData); // Log the parsed data
-
+      const responseData = await response.json();
+      localStorage.setItem("ambulanceId", responseData?.ambulanceId || ""); // Handle potential undefined
+      console.log("Emergency request submitted successfully! Response:", responseData);
 
       if (!response.ok) {
-        // Log the error response body for more details
         const errorText = await response.text();
         console.error("Failed to submit request:", {
           status: response.status,
@@ -97,9 +94,6 @@ export default function UsersPage({ user }: UsersPageProps) {
         });
         throw new Error(`Failed to submit request: ${response.statusText}`);
       }
-
-
-      
     } catch (error) {
       console.error("Error submitting emergency request:", error);
     }
@@ -145,4 +139,3 @@ export default function UsersPage({ user }: UsersPageProps) {
     </div>
   );
 }
-
